@@ -1,0 +1,53 @@
+pipeline {
+    agent any
+
+    stages {
+
+        stage('Checkout') {
+            steps {
+                git branch: 'main',
+                    url: 'https://github.com/your/repo.git'
+            }
+        }
+
+        stage('Install Dependencies') {
+            steps {
+                bat '''
+                    echo Installing dependencies...
+                    npm install
+                '''
+            }
+        }
+
+        stage('Install Playwright Browsers') {
+            steps {
+                bat '''
+                    echo Installing Playwright browsers...
+                    npx playwright install
+                '''
+            }
+        }
+
+        stage('Run Playwright Tests') {
+            steps {
+                bat '''
+                    echo Running Playwright tests...
+                    npx playwright test
+                '''
+            }
+        }
+
+        stage('Publish Playwright Report') {
+            steps {
+                publishHTML([
+                    allowMissing: false,
+                    alwaysLinkToLastBuild: true,
+                    keepAll: true,
+                    reportDir: 'playwright-report',
+                    reportFiles: 'index.html',
+                    reportName: 'Playwright Report'
+                ])
+            }
+        }
+    }
+}
